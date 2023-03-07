@@ -10,12 +10,16 @@ public class CameraController : MonoBehaviour
     private Transform camTransform;
     private Transform playerTransform;
     private BoxCollider2D levelLimit;
+    private float cameraSizeHorizontal;
+    private float cameraSizeVertical;
 
 
     // Start is called before the first frame update
     void Start()
     {
         levelLimit = GameObject.Find("LevelLimit").GetComponent<BoxCollider2D>();
+        cameraSizeVertical = Camera.main.orthographicSize;
+        cameraSizeHorizontal = Camera.main.orthographicSize * Camera.main.aspect;
 
         camTransform = transform;
         playerController = FindObjectOfType<PlayerController>();
@@ -23,7 +27,7 @@ public class CameraController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
         FollowCamera();
     }
@@ -32,7 +36,13 @@ public class CameraController : MonoBehaviour
     {
         if (playerController != null)
         {
-            camTransform.position = new Vector3(playerTransform.position.x, playerTransform.position.y, camTransform.position.z);
+            camTransform.position = new Vector3(Mathf.Clamp(playerTransform.position.x,
+                                                            levelLimit.bounds.min.x + cameraSizeHorizontal,
+                                                            levelLimit.bounds.max.x - cameraSizeHorizontal),
+                                                Mathf.Clamp(playerTransform.position.y, 
+                                                            levelLimit.bounds.min.y + cameraSizeVertical,
+                                                            levelLimit.bounds.max.y - cameraSizeVertical),
+                                                camTransform.position.z);
         }
     }
 }
