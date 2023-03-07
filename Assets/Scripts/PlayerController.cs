@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,7 +27,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-            playerRB = GetComponent<Rigidbody2D>();
+       playerRB = GetComponent<Rigidbody2D>();
     }
 
     private void Start()
@@ -42,29 +43,33 @@ public class PlayerController : MonoBehaviour
     {   
         MovePlayer();
         JumpPlayer();
+        CheckDirection();
+        SetAnimator();
     }
-
-    private void JumpPlayer()
+        private void MovePlayer()
+    {
+        float inputX = Input.GetAxisRaw("Horizontal") * moveSpeed;
+        playerRB.velocity = new Vector2(inputX, playerRB.velocity.y);
+    }
+        private void JumpPlayer()
     {
         isGrounded = Physics2D.OverlapCircle(checkGroundPoint.position, 0.2f, selectedLayerMask);
-        animator.SetBool(IdIsGrounded, isGrounded);
-
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             playerRB.velocity = new Vector2(playerRB.velocity.x, jumpForce);
         }
     }
-
-    private void MovePlayer()
+        private void CheckDirection()
     {
         if (playerRB.velocity.x < 0)
             transform.localScale = new Vector3(-1, 1, 1);
 
         else if (playerRB.velocity.x > 0)
             transform.localScale = Vector3.one;
-
-        float inputX = Input.GetAxisRaw("Horizontal") * moveSpeed;
-        playerRB.velocity = new Vector2(inputX, playerRB.velocity.y);
+    }
+        private void SetAnimator()
+    {
         animator.SetFloat(IdSpeed, Mathf.Abs(playerRB.velocity.x));
+        animator.SetBool(IdIsGrounded, isGrounded);
     }
 }
