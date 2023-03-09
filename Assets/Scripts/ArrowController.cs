@@ -7,13 +7,18 @@ public class ArrowController : MonoBehaviour
     private Rigidbody2D arrowRB;
     [SerializeField]
     private float arrowSpeed;
-    private Vector2 arrowDirection;
+    private Vector2 _arrowDirection;
 
-    public Vector2 ArrowDirection { get => arrowDirection; set => arrowDirection = value; }
+    public Vector2 ArrowDirection { get => _arrowDirection; set => _arrowDirection = value; }
+
+    [SerializeField]
+    private GameObject arrowImpact;
+    private Transform transformArrow;
 
     private void Awake()
     {
         arrowRB = GetComponent<Rigidbody2D>();
+        transformArrow = GetComponent<Transform>();
     }
 
     // Update is called once per frame
@@ -24,6 +29,7 @@ public class ArrowController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        Instantiate(arrowImpact, transformArrow.position,Quaternion.identity);
         Destroy(gameObject);
     }
 

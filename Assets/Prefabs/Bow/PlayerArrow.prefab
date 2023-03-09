@@ -183,3 +183,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arrowSpeed: 13
+  arrowImpact: {fileID: 2355609241526495026, guid: e4e25ac8c596d5e48ae59f29abdfe14b, type: 3}

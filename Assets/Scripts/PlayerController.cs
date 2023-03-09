@@ -33,6 +33,11 @@ public class PlayerController : MonoBehaviour
     private ArrowController arrowController;
     private Transform transformPlayerController;
 
+    [SerializeField]
+    private GameObject dustJump;
+    private Transform transformDustPoint;
+    private bool isIdle;
+
     private void Awake()
     {
        playerRB = GetComponent<Rigidbody2D>();
@@ -42,12 +47,14 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        
         checkGroundPoint = GameObject.Find("CheckGroundPoint").GetComponent<Transform>();
         animator = GameObject.Find("IddlePlayer").GetComponent<Animator>();
         IdSpeed = Animator.StringToHash("Speed");
         IdIsGrounded = Animator.StringToHash("isGrounded");
         IdShootArrow = Animator.StringToHash("shootArrow");
         transformArrowPoint = GameObject.Find("ArrowPoint").GetComponent<Transform>();
+        transformDustPoint = GameObject.Find("DustPoint").GetComponent<Transform>();
     }
 
     // Update is called once per frame
@@ -57,6 +64,7 @@ public class PlayerController : MonoBehaviour
         JumpPlayer();
         CheckAndSetDirection();
         ShootArrow();
+        PlayDust();
     }
 
     private void ShootArrow()
@@ -73,7 +81,6 @@ public class PlayerController : MonoBehaviour
             else
             {
                 tempArrowController.ArrowDirection = new Vector2(1, 0);
-
             }
             animator.SetTrigger(IdShootArrow);
         }
@@ -91,6 +98,7 @@ public class PlayerController : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(checkGroundPoint.position, 0.2f, selectedLayerMask);
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
+            Instantiate(dustJump,transformDustPoint.position,Quaternion.identity);
             playerRB.velocity = new Vector2(playerRB.velocity.x, jumpForce);
         }
         animator.SetBool(IdIsGrounded, isGrounded);
@@ -110,5 +118,20 @@ public class PlayerController : MonoBehaviour
             isFlippedInX = false;
         }
         return isFlippedInX;
+    }
+
+    private void PlayDust()
+    {
+        if (playerRB.velocity.x < 0 && isIdle || playerRB.velocity.x > 0 && isIdle)
+        {
+            isIdle = false;
+            if (isGrounded)
+                Instantiate(dustJump, transformDustPoint.position, Quaternion.identity);
+        }
+
+        if (playerRB.velocity.x == 0)
+        {
+            isIdle = true;
+        }
     }
 }
