@@ -182,4 +182,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b021bf2189937844fb64759547a092bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowSpeed: 10
+  arrowSpeed: 13

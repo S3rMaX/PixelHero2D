@@ -9,20 +9,17 @@ public class ArrowController : MonoBehaviour
     private float arrowSpeed;
     private Vector2 arrowDirection;
 
+    public Vector2 ArrowDirection { get => arrowDirection; set => arrowDirection = value; }
+
     private void Awake()
     {
         arrowRB = GetComponent<Rigidbody2D>();
     }
 
-    private void Start()
-    {
-        arrowDirection = new Vector2 (1, arrowRB.velocity.y);
-    }
-
     // Update is called once per frame
     void Update()
     {
-        arrowRB.velocity = arrowDirection * arrowSpeed;
+        arrowRB.velocity = ArrowDirection * arrowSpeed;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
