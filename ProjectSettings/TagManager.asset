@@ -12,8 +12,8 @@ TagManager:
   - Water
   - UI
   - No Collision
-  - 
-  - 
+  - Arrow
+  - Player
   - 
   - 
   - 
@@ -46,4 +46,7 @@ TagManager:
     locked: 0
   - name: Ground
     uniqueID: 2079872175
+    locked: 0
+  - name: Player
+    uniqueID: 1333548519
     locked: 0
