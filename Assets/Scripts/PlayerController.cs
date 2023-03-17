@@ -13,13 +13,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private LayerMask selectedLayerMask;
     private Rigidbody2D playerRB;
-    private Transform checkGroundPoint, transformPlayerController;
+    [SerializeField] private Transform checkGroundPoint;
+    private Transform transformPlayerController;
     private bool isGrounded,isFlippedInX;
     private Animator animatorStandingPlayer;
     private Animator animatorBallPlayer;
     private int IdSpeed, IdIsGrounded, IdShootArrow, IdCanDoubleJump;
     private float ballModeCounter;
     [SerializeField] private float waitForBallMode;
+    [SerializeField] private float isGroundedRange;
 
     //Player Shoot
     [Header("Player Shoot")]
@@ -54,12 +56,16 @@ public class PlayerController : MonoBehaviour
     //Player Sprites
     [SerializeField] private GameObject standingPlayer;
     [SerializeField] private GameObject ballPlayer;
+
+    //Player Extras
+    private PlayerExtrasTracker playerExtrasTracker;
     
     private void Awake()
     {
         playerRB = GetComponent<Rigidbody2D>();
         transformPlayerController = GetComponent<Transform>();
         isFlippedInX = CheckAndSetDirection();
+        playerExtrasTracker = GetComponent<PlayerExtrasTracker>();
     }
 
     private void Start()
@@ -67,7 +73,7 @@ public class PlayerController : MonoBehaviour
         standingPlayer = GameObject.Find("IddlePlayer");
         ballPlayer = GameObject.Find("BallPlayer");
         ballPlayer.SetActive(false);
-        checkGroundPoint = GameObject.Find("CheckGroundPoint").GetComponent<Transform>();
+        //checkGroundPoint = GameObject.Find("CheckGroundPoint").GetComponent<Transform>();   //It's already controlled by the editor.
         transfromBombPoint = GameObject.Find("BombPoint").GetComponent<Transform>();
         animatorStandingPlayer = standingPlayer.GetComponent<Animator>();
         animatorBallPlayer = ballPlayer.GetComponent<Animator>();
@@ -95,7 +101,7 @@ public class PlayerController : MonoBehaviour
             afterDashCounter -= Time.deltaTime;
         else
         {
-            if (Input.GetButtonDown("Fire2") && standingPlayer.activeSelf)
+            if ((Input.GetButtonDown("Fire2") && standingPlayer.activeSelf) && playerExtrasTracker.CanDash)
             {
                 dashCounter = dashTime;
                 ShowAfterImage();
@@ -122,8 +128,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1") && standingPlayer.activeSelf)
         {
-            ArrowController tempArrowController = Instantiate(arrowController, transformArrowPoint.position,
-                                                                              transformArrowPoint.rotation);
+            ArrowController tempArrowController = Instantiate(arrowController, transformArrowPoint.position,transformArrowPoint.rotation);
             if (isFlippedInX)
             {
                 tempArrowController.ArrowDirection = new Vector2(-1, 0);
@@ -135,7 +140,7 @@ public class PlayerController : MonoBehaviour
             }
             animatorStandingPlayer.SetTrigger(IdShootArrow);
         }
-        if (Input.GetButtonDown("Fire1") && ballPlayer.activeSelf)
+        if ((Input.GetButtonDown("Fire1") && ballPlayer.activeSelf) && playerExtrasTracker.CanDropBomb)
             Instantiate(prefabBomb, transfromBombPoint.position, Quaternion.identity);
     }
     private void MovePlayer()
@@ -153,8 +158,9 @@ public class PlayerController : MonoBehaviour
     }
     private void JumpPlayer()
     {
-        isGrounded = Physics2D.OverlapCircle(checkGroundPoint.position, 0.2f, selectedLayerMask);
-        if (Input.GetButtonDown("Jump") && (isGrounded || canDoubleJump))
+        //isGrounded = Physics2D.OverlapCircle(checkGroundPoint.position, 0.2f, selectedLayerMask);
+        isGrounded = Physics2D.Raycast(checkGroundPoint.position, Vector2.down, isGroundedRange, selectedLayerMask);
+        if (Input.GetButtonDown("Jump") && (isGrounded || canDoubleJump && playerExtrasTracker.CanDoubleJump))
         {
             if (isGrounded)
             {
@@ -211,7 +217,7 @@ public class PlayerController : MonoBehaviour
     private void BallMode()
     {
         float inputVertical = Input.GetAxisRaw("Vertical");
-        if (inputVertical <= -.9f && !ballPlayer.activeSelf || inputVertical >= .9f && ballPlayer.activeSelf)
+        if ((inputVertical <= -.9f && !ballPlayer.activeSelf || inputVertical >= .9f && ballPlayer.activeSelf) && playerExtrasTracker.CanEnterBallMode)
         {
             ballModeCounter -= Time.deltaTime;
             if(ballModeCounter < 0)
@@ -224,5 +230,10 @@ public class PlayerController : MonoBehaviour
         {
             ballModeCounter = waitForBallMode;
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(checkGroundPoint.position, isGroundedRange);
     }
 }

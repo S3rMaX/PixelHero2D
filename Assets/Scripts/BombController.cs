@@ -9,8 +9,8 @@ public class BombController : MonoBehaviour
     [SerializeField]private float waitForDestroy;
     private Animator animator;
     private bool isActive;
-    private int IDIsActive;
-    private Transform transformBomb;
+    private int IdIsActive;
+    [SerializeField] private Transform transformBomb;
     [SerializeField] private float expansiveWaveRange;
     [SerializeField] private LayerMask isDestroyable;
 
@@ -18,8 +18,8 @@ public class BombController : MonoBehaviour
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        IDIsActive = Animator.StringToHash("isActive");
-        transformBomb = GetComponent<Transform>();
+        IdIsActive = Animator.StringToHash("isActive");
+        //transformBomb = GetComponent<Transform>();        //It's already controlled by the editor.
     }
 
     private void Update()
@@ -39,7 +39,7 @@ public class BombController : MonoBehaviour
     private void ActivateBomb()
     {
         isActive = true;
-        animator.SetBool(IDIsActive, isActive);
+        animator.SetBool(IdIsActive, isActive);
         Collider2D[] destroyedObjects = Physics2D.OverlapCircleAll(transformBomb.position, expansiveWaveRange, isDestroyable);
         if (destroyedObjects.Length > 0)
         {
@@ -48,5 +48,10 @@ public class BombController : MonoBehaviour
                 Destroy(col.gameObject);
             }
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(transformBomb.position, expansiveWaveRange);
     }
 }
