@@ -231,7 +231,6 @@ public class PlayerController : MonoBehaviour
             ballModeCounter = waitForBallMode;
         }
     }
-
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(checkGroundPoint.position, isGroundedRange);
