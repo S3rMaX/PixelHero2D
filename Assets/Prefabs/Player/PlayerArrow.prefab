@@ -16,11 +16,11 @@ GameObject:
   - component: {fileID: 6631743483486253716}
   m_Layer: 7
   m_Name: PlayerArrow
-  m_TagString: Untagged
+  m_TagString: Arrow
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8550045050759584872
 Transform:
   m_ObjectHideFlags: 0
@@ -28,13 +28,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2453084708685565930}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7927686539678625495
 SpriteRenderer:
@@ -108,6 +108,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!50 &4173177452334796742
 Rigidbody2D:
   serializedVersion: 4
@@ -182,5 +183,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b021bf2189937844fb64759547a092bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  arrowRB: {fileID: 0}
   arrowSpeed: 13
   arrowImpact: {fileID: 2355609241526495026, guid: e4e25ac8c596d5e48ae59f29abdfe14b, type: 3}
+  arrowHit: {fileID: 2355609241526495026, guid: e53046c36508c6d44a714e3bc94493ec, type: 3}
+  _enemyController: {fileID: 0}
+  layerMaskGround:
+    serializedVersion: 2
+    m_Bits: 8
+  layerMaskDestroyable:
+    serializedVersion: 2
+    m_Bits: 512

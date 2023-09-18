@@ -1,21 +1,21 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.Runtime.Remoting.Messaging;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    public static PlayerController instance;
+    
     //Player Movement
     [Header("Player Movement")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private LayerMask selectedLayerMask;
+    public bool isFacingRight = true;
     private Rigidbody2D playerRB;
     [SerializeField] private Transform checkGroundPoint;
     private Transform transformPlayerController;
-    private bool isGrounded,isFlippedInX;
+    private bool isGrounded;
     private Animator animatorStandingPlayer;
     private Animator animatorBallPlayer;
     private int IdSpeed, IdIsGrounded, IdShootArrow, IdCanDoubleJump;
@@ -64,8 +64,8 @@ public class PlayerController : MonoBehaviour
     {
         playerRB = GetComponent<Rigidbody2D>();
         transformPlayerController = GetComponent<Transform>();
-        isFlippedInX = CheckAndSetDirection();
         playerExtrasTracker = GetComponent<PlayerExtrasTracker>();
+        instance = this;
     }
 
     private void Start()
@@ -73,7 +73,6 @@ public class PlayerController : MonoBehaviour
         standingPlayer = GameObject.Find("IddlePlayer");
         ballPlayer = GameObject.Find("BallPlayer");
         ballPlayer.SetActive(false);
-        //checkGroundPoint = GameObject.Find("CheckGroundPoint").GetComponent<Transform>();   //It's already controlled by the editor.
         transfromBombPoint = GameObject.Find("BombPoint").GetComponent<Transform>();
         animatorStandingPlayer = standingPlayer.GetComponent<Animator>();
         animatorBallPlayer = ballPlayer.GetComponent<Animator>();
@@ -84,13 +83,11 @@ public class PlayerController : MonoBehaviour
         transformArrowPoint = GameObject.Find("ArrowPoint").GetComponent<Transform>();
         transformDustPoint = GameObject.Find("DustPoint").GetComponent<Transform>();
     }
-
     // Update is called once per frame
     void Update()
     {
         Dash();
         JumpPlayer();
-        CheckAndSetDirection();
         Shoot();
         PlayDust();
         BallMode();
@@ -101,21 +98,30 @@ public class PlayerController : MonoBehaviour
             afterDashCounter -= Time.deltaTime;
         else
         {
-            if ((Input.GetButtonDown("Fire2") && standingPlayer.activeSelf) && playerExtrasTracker.CanDash)
+            //if ((Input.GetButtonDown("Fire2") && standingPlayer.activeSelf) && playerExtrasTracker.CanDash)
+            if ((Input.GetButtonDown("Fire2") && standingPlayer.activeSelf) && playerExtrasTracker.Dash)
             {
                 dashCounter = dashTime;
-                ShowAfterImage();
+                //ShowAfterImage();
             }
         }
         
         if (dashCounter > 0)
         {
             dashCounter -= Time.deltaTime;
-            playerRB.velocity = new Vector2(dashSpeed * transformPlayerController.localScale.x,playerRB.velocity.y);
+            if (isFacingRight)
+            {
+                playerRB.velocity = new Vector2(dashSpeed * transformPlayerController.localScale.x,playerRB.velocity.y);
+            }
+            else
+            {
+                playerRB.velocity = new Vector2(dashSpeed * (transformPlayerController.localScale.x * -1),playerRB.velocity.y);
+            }
             afterImageCounter -= Time.deltaTime;
             if (afterImageCounter <= 0)
             {
                 ShowAfterImage();
+                FlipDirection();
             }
             afterDashCounter = waitForDash;
         }
@@ -128,20 +134,30 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1") && standingPlayer.activeSelf)
         {
-            ArrowController tempArrowController = Instantiate(arrowController, transformArrowPoint.position,transformArrowPoint.rotation);
-            if (isFlippedInX)
-            {
-                tempArrowController.ArrowDirection = new Vector2(-1, 0);
-                tempArrowController.GetComponent<SpriteRenderer>().flipX = true;
-            }
-            else
-            {
-                tempArrowController.ArrowDirection = new Vector2(1, 0);
-            }
+            //Instantiate(arrowController, transformArrowPoint.position, transformArrowPoint.rotation);
+            GameObject arrow = ArrowPool.Instance.RequestArrow();
+            arrow.transform.position = transformArrowPoint.position;
             animatorStandingPlayer.SetTrigger(IdShootArrow);
         }
-        if ((Input.GetButtonDown("Fire1") && ballPlayer.activeSelf) && playerExtrasTracker.CanDropBomb)
-            Instantiate(prefabBomb, transfromBombPoint.position, Quaternion.identity);
+
+        if ((Input.GetButtonDown("Fire1") && ballPlayer.activeSelf) && playerExtrasTracker.BallModeandDropBombs)
+                Instantiate(prefabBomb, transformPlayerController.position, Quaternion.identity);
+    }
+    private void FlipDirection()
+    {
+        if (playerRB.velocity.x > 0 && !isFacingRight)
+        {
+            Flip();
+        }
+        else if (playerRB.velocity.x < 0 && isFacingRight)
+        {
+            Flip();
+        }
+    }
+    private void Flip()
+    {
+        isFacingRight = !isFacingRight;
+        transformPlayerController.Rotate(0f, 180f, 0f);
     }
     private void MovePlayer()
     {
@@ -155,12 +171,14 @@ public class PlayerController : MonoBehaviour
         {
             animatorBallPlayer.SetFloat(IdSpeed, Mathf.Abs(playerRB.velocity.x));
         }
+        FlipDirection();
     }
     private void JumpPlayer()
     {
         //isGrounded = Physics2D.OverlapCircle(checkGroundPoint.position, 0.2f, selectedLayerMask);
         isGrounded = Physics2D.Raycast(checkGroundPoint.position, Vector2.down, isGroundedRange, selectedLayerMask);
-        if (Input.GetButtonDown("Jump") && (isGrounded || canDoubleJump && playerExtrasTracker.CanDoubleJump))
+        //if (Input.GetButtonDown("Jump") && (isGrounded || canDoubleJump && playerExtrasTracker.CanDoubleJump))
+        if (Input.GetButtonDown("Jump") && (isGrounded || canDoubleJump && playerExtrasTracker.DoubleJump))
         {
             if (isGrounded)
             {
@@ -175,21 +193,6 @@ public class PlayerController : MonoBehaviour
             playerRB.velocity = new Vector2(playerRB.velocity.x, jumpForce);
         }
         animatorStandingPlayer.SetBool(IdIsGrounded, isGrounded);
-    }
-    private bool CheckAndSetDirection()
-    {
-        if (playerRB.velocity.x < 0)
-        {
-            transform.localScale = new Vector3(-1, 1, 1);
-            isFlippedInX = true;
-        }
-
-        else if (playerRB.velocity.x > 0)
-        {
-            transform.localScale = Vector3.one;
-            isFlippedInX = false;
-        }
-        return isFlippedInX;
     }
     private void PlayDust()
     {
@@ -217,7 +220,9 @@ public class PlayerController : MonoBehaviour
     private void BallMode()
     {
         float inputVertical = Input.GetAxisRaw("Vertical");
-        if ((inputVertical <= -.9f && !ballPlayer.activeSelf || inputVertical >= .9f && ballPlayer.activeSelf) && playerExtrasTracker.CanEnterBallMode)
+        //if ((inputVertical <= -.9f && !ballPlayer.activeSelf || inputVertical >= .9f && ballPlayer.activeSelf) && playerExtrasTracker.CanEnterBallMode)
+        if ((inputVertical <= -.9f && !ballPlayer.activeSelf || inputVertical >= .9f && ballPlayer.activeSelf) && playerExtrasTracker.BallModeandDropBombs)
+        
         {
             ballModeCounter -= Time.deltaTime;
             if(ballModeCounter < 0)
@@ -234,5 +239,20 @@ public class PlayerController : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(checkGroundPoint.position, isGroundedRange);
+    }
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("BatEnemy"))
+        {
+            EnemyController enemyController = collision.gameObject.GetComponent<EnemyController>();
+            if (enemyController != null)
+            {
+                enemyController.OnPlayerCollision();
+            }
+        }
     }
 }

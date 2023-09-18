@@ -1,34 +1,107 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ItemsManager : MonoBehaviour
 {
-    [SerializeField] private Dictionary<string, int> _itemsCollected = new Dictionary<string, int>();
+    public static ItemsManager instance;
+    
+    [SerializeField] private PlayerExtrasTracker _playerExtrasTracker;
+    
+    [HideInInspector] public int heartsToUnlockDoubleJump = 5;
+    [HideInInspector] public int coinsSpinningToUnlockDash = 6;
+    [HideInInspector] public int coinsShiningToUnlockBallModeAndDropBombs = 10;
 
-    public void AddItem(string itemName, int amount)
+    private void Awake()
     {
-        if (_itemsCollected.ContainsKey(itemName))
+        instance = this;
+    }
+
+    /*private void Start()
+    {
+        _playerExtrasTracker = GetComponent<PlayerExtrasTracker>();
+    }*/
+
+    public void CountDownItem(string itemType)
+    {
+        if (itemType == "HeartShining" && heartsToUnlockDoubleJump > 0)
         {
-            _itemsCollected[itemName] += amount;
+            heartsToUnlockDoubleJump--;
+            Debug.Log("HeartShining restantes" + " = " + heartsToUnlockDoubleJump);
         }
-        else
+
+        if (itemType == "CoinSpin" && coinsSpinningToUnlockDash > 0)
         {
-            _itemsCollected.Add(itemName, amount);
+            coinsSpinningToUnlockDash--;
+            Debug.Log("CoinsSpin restantes" + " = " + coinsSpinningToUnlockDash);
+        }
+
+        if (itemType == "CoinShine" && coinsShiningToUnlockBallModeAndDropBombs > 0)
+        {
+            coinsShiningToUnlockBallModeAndDropBombs--;
+            Debug.Log("CoinShine restantes" + " = " + coinsShiningToUnlockBallModeAndDropBombs);
+        }
+        ActivatePowerUp();
+    }
+
+    public void ActivatePowerUp()
+    {
+        if (heartsToUnlockDoubleJump <= 0)
+        {
+            _playerExtrasTracker.DoubleJump = true;
+        }
+
+        if (coinsSpinningToUnlockDash <= 0)
+        {
+            _playerExtrasTracker.Dash = true;
+        }
+
+        if (coinsShiningToUnlockBallModeAndDropBombs <= 0)
+        {
+            _playerExtrasTracker.BallModeandDropBombs = true;
         }
     }
 
-    public int GetItemCount(string itemName)
+    /*[SerializeField] private int heartsToUnlockDoubleJump = 5;
+    [SerializeField] private int coinsToUnlockDash = 6;
+    [SerializeField] private int coinsToUnlockBallModeAndBombs = 10;
+
+    private int collectedHearts = 0;
+    private int collectedCoins = 0;
+    
+    private bool doubleJumpUnlocked = false;
+    private bool dashUnlocked = false;
+    private bool ballModeAndBombsUnlocked = false;
+
+    private PlayerExtrasTracker _playerExtrasTracker;
+
+    private void Start()
     {
-        int amount = 0;
-        if (_itemsCollected.ContainsKey(itemName))
-        {
-            amount = _itemsCollected[itemName];
-        }
-        Debug.Log("Total Items:" + amount);
-        return amount;
-        
+        _playerExtrasTracker = GetComponent<PlayerExtrasTracker>();
     }
+
+    public void CollectHeart()
+    {
+        collectedHearts++;
+        if (collectedHearts >= heartsToUnlockDoubleJump & !doubleJumpUnlocked)
+        {
+            doubleJumpUnlocked = true;
+            _playerExtrasTracker.UnlockDoubleJump();
+        }
+    }
+
+    public void CollectCoin()
+    {
+        collectedCoins++;
+        if (collectedCoins >= coinsToUnlockDash && !dashUnlocked)
+        {
+            dashUnlocked = true;
+            _playerExtrasTracker.UnlockDash();
+        }
+
+        if (collectedCoins >= coinsToUnlockBallModeAndBombs && !ballModeAndBombsUnlocked)
+        {
+            ballModeAndBombsUnlocked = true;
+            _playerExtrasTracker.UnlockBallModeAndBombs();
+        }
+    }*/
 }

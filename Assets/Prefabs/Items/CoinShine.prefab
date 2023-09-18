@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 4494532926903995980}
   - component: {fileID: 1510180594771859729}
   - component: {fileID: 6016814486356364171}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: CoinShine
-  m_TagString: Untagged
+  m_TagString: CoinShine
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -27,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 213123635265253389}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &6016024018292814384
 BoxCollider2D:
@@ -92,7 +92,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6e18de8222cab43a801640399318dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemsManager: {fileID: 0}
+  sprite: {fileID: 0}
+  fadeDurationTime: -0.05
+  fadeSpeed: 0.05
+  translationUnits: 0.1
+  translationSpeed: 1
 --- !u!95 &1510180594771859729
 Animator:
   serializedVersion: 5
@@ -113,6 +117,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!212 &6016814486356364171
 SpriteRenderer:
   m_ObjectHideFlags: 0

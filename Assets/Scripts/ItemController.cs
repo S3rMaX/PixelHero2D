@@ -1,24 +1,74 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
+using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ItemController : MonoBehaviour
 {
-    [SerializeField] private ItemsManager itemsManager;
+    [Header("Extras/ Skills")]
+    public SpriteRenderer sprite;
+    private GameObject player;
 
+    [Header("Item Fade Settings")]
+    [SerializeField] private float fadeDurationTime = -0.05f;
+    [SerializeField] private float fadeSpeed = 0.05f;
+
+    [Header("Item Translation Settings")]
+    [SerializeField] private float translationUnits = 0.1f;
+    [SerializeField] private float translationSpeed = 1f;
+    private Transform itemTransform;
+
+    private string itemType;
+    
     void Start()
     {
-        itemsManager = FindObjectOfType<ItemsManager>();   
+        player = GameObject.FindWithTag("Player");
+        sprite = GetComponent<SpriteRenderer>();
+        itemTransform = GetComponent<Transform>();
+        itemType = gameObject.tag; //Tag de item recogido.
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            itemsManager.AddItem("CoinSpin", 1);
-            itemsManager.GetItemCount("CoinSpin");
-            Destroy(gameObject);
+            SetTracker();
+            ItemsManager.instance.CountDownItem(itemType);
+        }
+    }
+
+    private void SetTracker()
+    {
+        StartCoroutine(FadeOutItem());
+        StartCoroutine(MoveItemUp());
+    }
+
+    private IEnumerator FadeOutItem()
+    {
+        for (float i = 1; i >= fadeDurationTime; i -= fadeSpeed)
+        {
+            Color c = sprite.material.color;
+            c.a = i;
+            sprite.material.color = c;
+
+            yield return new WaitForSeconds(fadeDurationTime);
+        }
+
+        Destroy(gameObject);
+    }
+
+    private IEnumerator MoveItemUp()
+    {
+        Vector3 destroyItemPosition = new Vector2(itemTransform.position.x, itemTransform.position.y + 2);
+
+        for (float i = 0; i <= 2; i += translationUnits)
+        {
+            if (itemTransform.position != destroyItemPosition)
+            {
+                itemTransform.position = new Vector2(itemTransform.position.x, itemTransform.position.y + (translationUnits * translationSpeed));
+            }
+
+            yield return new WaitForSeconds(0.02f);
         }
     }
 }
+

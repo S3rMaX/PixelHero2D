@@ -1,13 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UnlockExtras : MonoBehaviour
 {
     [SerializeField] private GameObject player;
     [SerializeField] private PlayerExtrasTracker playerExtrasTracker;
-    [SerializeField] private bool canDoubleJump, canDash, canEnterBallMode, canDropBomb;
+    [SerializeField] private bool canDoubleJump, canDash, canEnterBallModeandDropBombs;
 
     private void Start()
     {
@@ -26,9 +23,13 @@ public class UnlockExtras : MonoBehaviour
 
     private void SetTracker()
     {
-        if (canDoubleJump) playerExtrasTracker.CanDoubleJump = true;
-        if (canDash) playerExtrasTracker.CanDash = true;
-        if (canEnterBallMode) playerExtrasTracker.CanEnterBallMode = true;
-        if (canDropBomb) playerExtrasTracker.CanDropBomb = true;
+        //if (canDoubleJump) playerExtrasTracker.CanDoubleJump = true;
+        if (canDoubleJump) playerExtrasTracker.DoubleJump = true;
+        //if (canDash) playerExtrasTracker.CanDash = true;
+        if (canDash) playerExtrasTracker.Dash = true;
+        //if (canEnterBallMode) playerExtrasTracker.CanEnterBallMode = true;
+        if (canEnterBallModeandDropBombs) playerExtrasTracker.BallModeandDropBombs = true;
+        //if (canDropBomb) playerExtrasTracker.CanDropBomb = true;
+        
     }
 }

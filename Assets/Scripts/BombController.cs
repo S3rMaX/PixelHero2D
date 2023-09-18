@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BombController : MonoBehaviour
@@ -19,7 +16,7 @@ public class BombController : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         IdIsActive = Animator.StringToHash("isActive");
-        //transformBomb = GetComponent<Transform>();        //It's already controlled by the editor.
+        transformBomb = GetComponent<Transform>();
     }
 
     private void Update()

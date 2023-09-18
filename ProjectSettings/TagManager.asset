@@ -6,7 +6,9 @@ TagManager:
   tags:
   - CoinSpin
   - CoinShine
-  - PickHeart
+  - BatEnemy
+  - Arrow
+  - HeartShining
   layers:
   - Default
   - TransparentFX
